@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotacionesApi.Models;
 using VotacionesApi.Services;
@@ -6,7 +7,6 @@ using VotacionesApi.Services;
 namespace VotacionesApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class VoterController : ControllerBase
     {
         private readonly IVoterServices _voterService;
@@ -48,6 +48,7 @@ namespace VotacionesApi.Controllers
         /// <returns>Lista de votantes registrados.</returns>
         /// <response code="200">Lista devuelta exitosamente.</response>
         /// <response code="400">Error al obtener los datos.</response>
+        [Authorize]
         [HttpGet("voters")]
         [ProducesResponseType(typeof(IEnumerable<Voter>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -72,6 +73,7 @@ namespace VotacionesApi.Controllers
         /// <response code="200">Votante encontrado.</response>
         /// <response code="404">Votante no encontrado.</response>
         /// <response code="400">Error al procesar la solicitud.</response>
+        [Authorize]
         [HttpGet("voters/{id}")]
         [ProducesResponseType(typeof(Voter), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,6 +102,7 @@ namespace VotacionesApi.Controllers
         /// <response code="204">Votante eliminado.</response>
         /// <response code="404">Votante no encontrado.</response>
         /// <response code="400">Error al eliminar.</response>
+        [Authorize]
         [HttpDelete("voters/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

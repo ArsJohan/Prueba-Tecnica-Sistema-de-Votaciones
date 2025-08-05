@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotacionesApi.Models;
 using VotacionesApi.Services;
@@ -6,7 +7,7 @@ using VotacionesApi.Services;
 namespace VotacionesApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+
     public class CandidateController : ControllerBase
     {
         private readonly ICandidateServices _candidateService;
@@ -74,6 +75,7 @@ namespace VotacionesApi.Controllers
         /// <response code="200">Candidato encontrado.</response>
         /// <response code="404">Candidato no encontrado.</response>
         /// <response code="500">Error interno al obtener candidato.</response>
+        [Authorize]
         [HttpGet("candidates/{id}")]
         [ProducesResponseType(typeof(Candidate), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,6 +104,7 @@ namespace VotacionesApi.Controllers
         /// <response code="204">Candidato eliminado.</response>
         /// <response code="404">Candidato no encontrado.</response>
         /// <response code="500">Error interno al eliminar candidato.</response>
+        [Authorize]
         [HttpDelete("candidates/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

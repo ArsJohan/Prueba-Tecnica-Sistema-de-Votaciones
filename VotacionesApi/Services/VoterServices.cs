@@ -36,6 +36,12 @@ namespace VotacionesApi.Services
                 {
                     throw new InvalidOperationException("El votante ya existe.");
                 }
+                Candidate isCandidate = await dbcontext.Candidates.FirstOrDefaultAsync(c => c.Name == voter.Name);
+                if (isCandidate != null)
+                {
+                    throw new InvalidOperationException("El votante no puede ser un candidato.");
+                }
+                voter.HasVoted = false;
                 dbcontext.Voters.Add(voter);
                 await dbcontext.SaveChangesAsync();
                 return voter;

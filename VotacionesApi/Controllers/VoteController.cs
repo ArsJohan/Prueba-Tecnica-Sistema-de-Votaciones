@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotacionesApi.DTOs;
 using VotacionesApi.Models;
@@ -7,7 +8,7 @@ using VotacionesApi.Services;
 namespace VotacionesApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    
     public class VoteController : ControllerBase
     {
         private readonly IVoteServices _voteService;
@@ -46,6 +47,7 @@ namespace VotacionesApi.Controllers
             }
         }
 
+
         /// <summary>
         /// Obtiene el total de votos por candidato.
         /// </summary>
@@ -53,11 +55,12 @@ namespace VotacionesApi.Controllers
         /// <response code="200">Datos encontrados exitosamente.</response>
         /// <response code="404">No se encontraron votos.</response>
         /// <response code="400">Error durante la consulta.</response>
+        [Authorize]
         [HttpGet("votes")]
-        [ProducesResponseType(typeof(IEnumerable<CandidateStats>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<CandidateStats>>> GetVotes()
+        public async Task<ActionResult<Dictionary<string, int>>> GetVotes()
         {
             try
             {
@@ -79,6 +82,7 @@ namespace VotacionesApi.Controllers
         /// <returns>Totales por candidato, porcentajes y votantes que han votado.</returns>
         /// <response code="200">Estadísticas generadas correctamente.</response>
         /// <response code="500">Error del servidor al generar estadísticas.</response>
+        [Authorize]
         [HttpGet("votes/statistics")]
         [ProducesResponseType(typeof(VoteStatisticsDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

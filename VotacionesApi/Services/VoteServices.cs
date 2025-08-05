@@ -49,12 +49,18 @@ namespace VotacionesApi.Services
             }
         }
 
-        public async Task<Dictionary<int, int>> GetVoteCountPerCandidateAsync()
+        public async Task<Dictionary<string, int>> GetVoteCountPerCandidateAsync()
         {
             return await dbcontext.Votes
-                .GroupBy(v => v.CandidateId)
-                .Select(g => new { CandidateId = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.CandidateId, x => x.Count);
+                .Include(v => v.Candidate)
+                .Where(v => v.Candidate != null)
+                .GroupBy(v => v.Candidate!.Name)
+                .Select(g => new
+                {
+                    CandidateName = g.Key,
+                    VoteCount = g.Count()
+                })
+                .ToDictionaryAsync(x => x.CandidateName, x => x.VoteCount);
         }
 
         public async Task<bool> HasVotedAsync(int voterId)

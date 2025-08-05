@@ -18,8 +18,8 @@ namespace VotacionesApi.Services
         /// <summary>
         /// Obtiene el total de votos por candidato.
         /// </summary>
-        /// <returns>Un diccionario con ID del candidato y total de votos.</returns>
-        Task<Dictionary<int, int>> GetVoteCountPerCandidateAsync();
+        /// <returns>Un diccionario con Nombre del candidato y total de votos.</returns>
+        Task<Dictionary<string, int>> GetVoteCountPerCandidateAsync();
 
         /// <summary>
         /// Verifica si un votante ya ha votado.
