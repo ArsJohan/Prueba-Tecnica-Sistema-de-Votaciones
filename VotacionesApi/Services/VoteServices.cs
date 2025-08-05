@@ -7,7 +7,7 @@ namespace VotacionesApi.Services
     /// <summary>
     /// Clase de servicios para manejar operaciones relacionadas con votaciones.
     /// </summary>
-    public class VoteServices : IVoteService
+    public class VoteServices : IVoteServices
     {
         // Inyección del contexto de la base de datos.
         private readonly ElectoralContext dbcontext;
@@ -18,12 +18,12 @@ namespace VotacionesApi.Services
         }
 
 
-        public async Task<Vote> RegisterVoteAsync(int? voterId, int? candidateId)
+        public async Task<Vote> RegisterVoteAsync(int voterId, int candidateId)
         {
             try
             {
                 var voter = await (dbcontext.Voters).FindAsync(voterId);
-                if (voter == null || (voter.HasVoted ?? false))
+                if (voter == null || voter.HasVoted)
                     throw new InvalidOperationException("Votante no válido.");
 
                 var candidate = await dbcontext.Candidates.FindAsync(candidateId);
@@ -54,7 +54,7 @@ namespace VotacionesApi.Services
             return await dbcontext.Votes
                 .GroupBy(v => v.CandidateId)
                 .Select(g => new { CandidateId = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.CandidateId ?? 0, x => x.Count);
+                .ToDictionaryAsync(x => x.CandidateId, x => x.Count);
         }
 
         public async Task<bool> HasVotedAsync(int voterId)
@@ -62,7 +62,7 @@ namespace VotacionesApi.Services
             var voter = await dbcontext.Voters.FindAsync(voterId);
             if (voter == null)
                 throw new InvalidOperationException("Votante no encontrado.");
-            return voter.HasVoted ?? false;
+            return voter.HasVoted;
 
         }
 

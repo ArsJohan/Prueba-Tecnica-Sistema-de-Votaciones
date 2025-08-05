@@ -6,7 +6,7 @@ namespace VotacionesApi.Services
     /// <summary>
     /// clase de servicios para manejar operaciones relacionadas con votantes.
     /// </summary>
-    public class VoterServices: IVoterService
+    public class VoterServices: IVoterServices
     {
         // Inyección del contexto de la base de datos.
         private readonly ElectoralContext dbcontext;

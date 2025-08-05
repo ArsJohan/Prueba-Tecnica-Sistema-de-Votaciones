@@ -5,7 +5,7 @@ namespace VotacionesApi.Services
     /// <summary>
     /// Interface para los servicios de votación.
     /// </summary>
-    public interface IVoteService
+    public interface IVoteServices
     {
         /// <summary>
         /// Registra un voto de un votante por un candidato.
@@ -13,7 +13,7 @@ namespace VotacionesApi.Services
         /// <param name="voterId">ID del votante.</param>
         /// <param name="candidateId">ID del candidato.</param>
         /// <returns>El voto registrado.</returns>
-        Task<Vote> RegisterVoteAsync(int? voterId, int? candidateId);
+        Task<Vote> RegisterVoteAsync(int voterId, int candidateId);
 
         /// <summary>
         /// Obtiene el total de votos por candidato.

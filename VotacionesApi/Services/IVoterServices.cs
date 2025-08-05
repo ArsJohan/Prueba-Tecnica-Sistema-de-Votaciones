@@ -5,7 +5,7 @@ namespace VotacionesApi.Services
     /// <summary>
     /// Interface para los servicios relacionados con votantes.
     /// </summary>
-    public interface IVoterService
+    public interface IVoterServices
     {
         /// <summary>
         /// Registra un nuevo votante.

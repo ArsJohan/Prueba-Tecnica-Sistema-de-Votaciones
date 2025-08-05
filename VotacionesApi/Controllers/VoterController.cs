@@ -5,26 +5,36 @@ using VotacionesApi.Services;
 
 namespace VotacionesApi.Controllers
 {
-    public class VoterController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class VoterController : ControllerBase
     {
-        private readonly IVoterService _voterService;
-        public VoterController(IVoterService voterService)
+        private readonly IVoterServices _voterService;
+
+        public VoterController(IVoterServices voterService)
         {
             _voterService = voterService;
         }
-        // POST: /voters
+
+        /// <summary>
+        /// Registra un nuevo votante.
+        /// </summary>
+        /// <param name="voter">Objeto votante a registrar.</param>
+        /// <returns>El votante creado.</returns>
+        /// <response code="201">Votante creado exitosamente.</response>
+        /// <response code="400">Datos inválidos o error al crear.</response>
         [HttpPost("voters")]
-        public ActionResult CreateVoter([FromBody] Voter voter)
+        [ProducesResponseType(typeof(Voter), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Voter>> CreateVoter([FromBody] Voter voter)
         {
-           
             try
             {
                 if (voter == null)
-                {
                     return BadRequest("Información del votante nula");
-                }
-                var createdVoter = _voterService.CreateVoterAsync(voter).Result;
-                return CreatedAtAction(nameof(GetAllVoters), new { id = createdVoter.Id }, createdVoter);
+
+                var createdVoter = await _voterService.CreateVoterAsync(voter);
+                return CreatedAtAction(nameof(GetVoterById), new { id = createdVoter.Id }, createdVoter);
             }
             catch (Exception ex)
             {
@@ -32,34 +42,48 @@ namespace VotacionesApi.Controllers
             }
         }
 
-
-        // GET: /voters
+        /// <summary>
+        /// Obtiene la lista de todos los votantes.
+        /// </summary>
+        /// <returns>Lista de votantes registrados.</returns>
+        /// <response code="200">Lista devuelta exitosamente.</response>
+        /// <response code="400">Error al obtener los datos.</response>
         [HttpGet("voters")]
-        public ActionResult GetAllVoters()
+        [ProducesResponseType(typeof(IEnumerable<Voter>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Voter>>> GetAllVoters()
         {
             try
             {
-                var voters = _voterService.GetAllVotersAsync().Result;
+                var voters = await _voterService.GetAllVotersAsync();
                 return Ok(voters);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error al extraer la informacion de los votantes: {ex.Message}");
+                return BadRequest($"Error al extraer la información de los votantes: {ex.Message}");
             }
         }
 
-        // GET: /voters/{id}
+        /// <summary>
+        /// Obtiene un votante por su ID.
+        /// </summary>
+        /// <param name="id">ID del votante.</param>
+        /// <returns>Objeto votante.</returns>
+        /// <response code="200">Votante encontrado.</response>
+        /// <response code="404">Votante no encontrado.</response>
+        /// <response code="400">Error al procesar la solicitud.</response>
         [HttpGet("voters/{id}")]
-        public ActionResult GetVoterById(int id)
+        [ProducesResponseType(typeof(Voter), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Voter>> GetVoterById(int id)
         {
-           
             try
             {
-                var voter = _voterService.GetVoterByIdAsync(id).Result;
+                var voter = await _voterService.GetVoterByIdAsync(id);
                 if (voter == null)
-                {
                     return NotFound($"Votante con ID {id} no encontrado.");
-                }
+
                 return Ok(voter);
             }
             catch (Exception ex)
@@ -68,24 +92,32 @@ namespace VotacionesApi.Controllers
             }
         }
 
-        // DELETE: /voters/{id}
+        /// <summary>
+        /// Elimina un votante por su ID.
+        /// </summary>
+        /// <param name="id">ID del votante.</param>
+        /// <returns>Sin contenido si se elimina correctamente.</returns>
+        /// <response code="204">Votante eliminado.</response>
+        /// <response code="404">Votante no encontrado.</response>
+        /// <response code="400">Error al eliminar.</response>
         [HttpDelete("voters/{id}")]
-        public ActionResult DeleteVoter(int id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteVoter(int id)
         {
             try
             {
-                var deleted = _voterService.DeleteVoterAsync(id).Result;
+                var deleted = await _voterService.DeleteVoterAsync(id);
                 if (!deleted)
-                {
                     return NotFound($"Votante con ID {id} no encontrado.");
-                }
+
                 return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error al eliminar el votante: {ex.Message}");
             }
-
         }
     }
 }

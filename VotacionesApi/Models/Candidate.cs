@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace VotacionesApi.Models;
 
@@ -13,5 +14,6 @@ public partial class Candidate
 
     public int? Votes { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Vote> VotesNavigation { get; set; } = new List<Vote>();
 }
