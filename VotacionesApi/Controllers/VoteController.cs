@@ -1,82 +1,73 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VotacionesApi.Models;
+using VotacionesApi.Services;
 
 namespace VotacionesApi.Controllers
 {
     public class VoteController : Controller
     {
-        // GET: VoteController
-        public ActionResult Index()
+        private readonly IVoteService _voteService;
+        public VoteController(IVoteService voteService)
         {
-            return View();
+            _voteService = voteService ;
+        }
+        // POST: /votes
+        [HttpPost("votes")]
+        public ActionResult CreateVote([FromBody] Vote vote)
+        {
+
+            try
+            {
+                if (vote == null)
+                {
+                    return BadRequest("Información del voto nula");
+                }
+                var createdVote = _voteService.RegisterVoteAsync(vote.VoterId, vote.CandidateId).Result;
+                if (createdVote == null)
+                    return BadRequest("No se pudo registrar el voto");
+                return StatusCode(201, createdVote); // HTTP 201 Created con el objeto en el cuerpo
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error creando un voto: {ex.Message}");
+            }
         }
 
-        // GET: VoteController/Details/5
-        public ActionResult Details(int id)
+        // GET: /votes
+        [HttpGet("votes")] 
+        public ActionResult GetVotes()
         {
-            return View();
+          
+            try
+            {
+                var votes = _voteService.GetVoteCountPerCandidateAsync().Result;
+                if (votes == null || !votes.Any())
+                {
+                    return NotFound("No se encontraron votos");
+                }
+                return Ok(votes); // HTTP 200 OK con los votos en el cuerpo
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error obteniendo los votos: {ex.Message}");
+            }
         }
 
-        // GET: VoteController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: VoteController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        // GET: /votes/stadistics
+        [HttpGet("votes/stadistics")]
+        public async Task<IActionResult> GetStatistics()
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+               
+                var stats = await _voteService.GetVoteStatisticsAsync();
+                return Ok(stats);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
-            }
-        }
-
-        // GET: VoteController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: VoteController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: VoteController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: VoteController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                // Devuelve un error 500 con el mensaje de error
+                return StatusCode(500, $"Error al obtener estadísticas: {ex.Message}");
             }
         }
     }

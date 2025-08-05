@@ -1,83 +1,91 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VotacionesApi.Models;
+using VotacionesApi.Services;
 
 namespace VotacionesApi.Controllers
 {
     public class VoterController : Controller
     {
-        // GET: VoterController
-        public ActionResult Index()
+        private readonly IVoterService _voterService;
+        public VoterController(IVoterService voterService)
         {
-            return View();
+            _voterService = voterService;
+        }
+        // POST: /voters
+        [HttpPost("voters")]
+        public ActionResult CreateVoter([FromBody] Voter voter)
+        {
+           
+            try
+            {
+                if (voter == null)
+                {
+                    return BadRequest("Información del votante nula");
+                }
+                var createdVoter = _voterService.CreateVoterAsync(voter).Result;
+                return CreatedAtAction(nameof(GetAllVoters), new { id = createdVoter.Id }, createdVoter);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error creando un votante: {ex.Message}");
+            }
         }
 
-        // GET: VoterController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
 
-        // GET: VoterController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: VoterController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        // GET: /voters
+        [HttpGet("voters")]
+        public ActionResult GetAllVoters()
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var voters = _voterService.GetAllVotersAsync().Result;
+                return Ok(voters);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return BadRequest($"Error al extraer la informacion de los votantes: {ex.Message}");
             }
         }
 
-        // GET: VoterController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: /voters/{id}
+        [HttpGet("voters/{id}")]
+        public ActionResult GetVoterById(int id)
         {
-            return View();
+           
+            try
+            {
+                var voter = _voterService.GetVoterByIdAsync(id).Result;
+                if (voter == null)
+                {
+                    return NotFound($"Votante con ID {id} no encontrado.");
+                }
+                return Ok(voter);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error al obtener el votante: {ex.Message}");
+            }
         }
 
-        // POST: VoterController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        // DELETE: /voters/{id}
+        [HttpDelete("voters/{id}")]
+        public ActionResult DeleteVoter(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var deleted = _voterService.DeleteVoterAsync(id).Result;
+                if (!deleted)
+                {
+                    return NotFound($"Votante con ID {id} no encontrado.");
+                }
+                return NoContent();
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return BadRequest($"Error al eliminar el votante: {ex.Message}");
             }
-        }
 
-        // GET: VoterController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: VoterController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
         }
     }
 }
