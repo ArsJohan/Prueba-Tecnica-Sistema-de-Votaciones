@@ -20,8 +20,8 @@ API RESTful para registrar votantes, candidatos y emitir votos. Implementada en 
 1. Clonar el repositorio:
 
 ```bash
-git clone https://github.com/tu-usuario/prueba-tecnica-sistema-votaciones.git
-cd prueba-tecnica-sistema-votaciones
+git clone https://github.com/ArsJohan/Prueba-Tecnica-Sistema-de-Votaciones.git
+cd Prueba-Tecnica-Sistema-de-Votaciones.git
 
 ```
 2. Ir a postgreSQL, crear una base de datos y oprimir la opcion de restaurar.
